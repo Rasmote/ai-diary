@@ -61,4 +61,10 @@ Ai 다이어리
 
 ## 참고 자료 (References)
 
+
+## 메모장
+- Nest에서는 TypeORM을 활용하여 관계형 데이터베이스를 객체 지향적인 방식으로 다뤘음. Spring에서는 Spring Data JPA가 해당 역할을 수행.  
+- Spring Data JPA는 JPA라는 표준 기술을 쉽게 쓰게 함.
+- JPA : JAVA의 ORM 인터페이스. DB랑 연동하기 위해 필요한 것들의 규칙을 정해놓은 것.
+
 ### 작성중...

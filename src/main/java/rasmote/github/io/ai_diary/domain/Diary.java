@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +22,11 @@ public class Diary {
     private String title;
 
     private String content;
+
+    @ManyToOne // Many(다이어리) to One(유저) 관계
+    @JoinColumn(name = "user_id") // 외래키 설정, JPA가 자동으로 User의 PK를 참조하는 외래키를 생성
+    // @JoinColumn(name = "author_username", referencedColumnName = "username") <- 만약 username을 외래키로 사용하고 싶다면 이렇게 작성
+    private User user;  //User 객체
 
     // 피드백, 생성 날짜 등 추가 예정.
 

@@ -72,10 +72,14 @@ Ai 다이어리
 - 빌더 개념 정리 1. Entity에서 @Builder 데코레이터를 사용한 생성자 작성, 2. dto의 toEntity()에서 .builder 사용.
 - @ 어노테이션이라고 한다 함.
 - ResponseEntity : 상태 코드, 헤더, 본문을 포함한 Spring에서 제공하는 클래스.
+- Entity에서 CreatedDate, LastModifiedDate같은 어노테이션들은 다음과 같은 과정을 거쳐야 함.
+    1. @@Application.java에 @EnableJpaAuditing 어노테이션 추가
+    2. 필요로 하는 엔티티 파일에서@EntityListeners(AuditingEntityListener.class) 어노테이션 추가
 
 
 ## 정리필요
 - 리포지토리, 엔티티 개념 다시
+- Config.java의 securityFilterChain 메서드 관련 개념 다시
 
 
 ### 작성중...

@@ -3,9 +3,11 @@ package rasmote.github.io.ai_diary.domain;
 import java.util.Date;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class) // JPA Auditing을 사용하기 위한 어노테이션
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

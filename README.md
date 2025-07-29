@@ -73,8 +73,9 @@ Ai 다이어리
 - @ 어노테이션이라고 한다 함.
 - ResponseEntity : 상태 코드, 헤더, 본문을 포함한 Spring에서 제공하는 클래스.
 - Entity에서 CreatedDate, LastModifiedDate같은 어노테이션들은 다음과 같은 과정을 거쳐야 함.
-    1. @@Application.java에 @EnableJpaAuditing 어노테이션 추가
+    1. ~~Application.java에 @EnableJpaAuditing 어노테이션 추가
     2. 필요로 하는 엔티티 파일에서@EntityListeners(AuditingEntityListener.class) 어노테이션 추가
+- @Service 와 @Component의 차이 : Component는 비즈니스 로직을 갖지 않고, 범용적인 목적으로 사용됨.
 
 
 ## 정리필요

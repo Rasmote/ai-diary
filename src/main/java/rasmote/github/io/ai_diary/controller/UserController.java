@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.domain.User;
+import rasmote.github.io.ai_diary.dto.LoginRequestDto;
 import rasmote.github.io.ai_diary.dto.SignupRequestDto;
 import rasmote.github.io.ai_diary.service.UserService;
 
@@ -24,5 +26,13 @@ public class UserController {
     public ResponseEntity<User> signup(@RequestBody SignupRequestDto requestDto) {
         User user = userService.signup(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    //2. 로그인
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
+        String token = userService.login(requestDto);
+        response.setHeader("Authorization", "Bearer " + token); // JWT 토큰을 응답 헤더에 설정
+        return ResponseEntity.ok(token); // 로그인 성공 시 JWT 토큰을 반환
     }
 }

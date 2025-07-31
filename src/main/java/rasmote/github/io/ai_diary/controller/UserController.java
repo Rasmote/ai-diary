@@ -30,9 +30,9 @@ public class UserController {
 
     //2. 로그인
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
+    public String login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
         String token = userService.login(requestDto);
         response.setHeader("Authorization", "Bearer " + token); // JWT 토큰을 응답 헤더에 설정
-        return ResponseEntity.ok(token); // 로그인 성공 시 JWT 토큰을 반환
+        return token; // 로그인 성공 시 JWT 토큰을 반환
     }
 }

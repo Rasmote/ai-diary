@@ -8,11 +8,23 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
+import rasmote.github.io.ai_diary.jwt.JwtAuthenticationFilter;
+import rasmote.github.io.ai_diary.jwt.JwtUtil;
+import rasmote.github.io.ai_diary.service.UserDetailsServicelmpl;
 
 
 @Configuration
 @EnableWebSecurity // Spring Security 설정 활성화, 웹 보안 설정 커스터마이징 가능하게
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    //4-1. 필요한 의존성들을 선언함
+    private final JwtUtil jwtUtil;
+    private final UserDetailsServicelmpl userDetailsService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -32,7 +44,12 @@ public class SecurityConfig {
             .anyRequest().authenticated() // 나머지 요청은 인증 필요
         );
 
-        // TODO : 4. JWT 인증 필터 추가
+        // 4. JWT 인증 필터 추가
+        // JwtAuthenticationFilter 를 Spring Security 필터 체인에 추가하기
+        // UsernamePasswordAuthenticationFilter(로그인 처리 필터) 보다 먼저 실행되도록
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService), 
+                UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build(); 
 

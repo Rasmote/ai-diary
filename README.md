@@ -76,11 +76,41 @@ Ai 다이어리
     1. ~~Application.java에 @EnableJpaAuditing 어노테이션 추가
     2. 필요로 하는 엔티티 파일에서@EntityListeners(AuditingEntityListener.class) 어노테이션 추가
 - @Service 와 @Component의 차이 : Component는 비즈니스 로직을 갖지 않고, 범용적인 목적으로 사용됨.
+- jwt 밑 두가지 코드들의 역할
+    1. JwtUtil : jwt라는 토큰이 진짜인지 가짜인지 판단, 발급 등
+    2. JwtAuthenticationFilter : 모든 http 요청의 jwt를  검사하고, 그 결과를 바탕으로 다음 절차를 진행
+        - 이때 Filter가 JwtUtil의 진위여부 판단 메서드를 활용함
+- **jwt 관련 요청 내부 동작 순서**
+    1. 요청이 들어오면 컨트롤러에 도달하기 전 SecurityConfig에 등록된JwtAuthenticationFilter가 요청을 가로챔
+    2. 추출된 토큰을 JwtUtil을 활용하여 서명을 검증하고, 만료 시간을 확인. 이후 필터는 토큰에서 사용자 이름 추출
+    3. UserDetailsServicelmpl에서 추출한 사용자 이름을 userRepository에서 DB에서 찾음.
+        - 조회된 User엔티티 정보를 바탕으로 Spring Security가 이해할 수 있는 UserDetails객체를 생성하여 필터로 반환
+    4. 필터는 UserDetails 객체를 받아 Authentication(UsernamePasswordAuthenticationToken) 객체를 생성함. 
+        - 해당 객체 내에는 사용자 정보와 권한 정보가 포함되어 있음.
+        - SecurityContextHolder.getContext()로 생성된 Authentication 객체를 SecurityContext에 등록
+        - SecurityContext는 요청이 처리되는 동안 인증 정보를 보관함.
+    5. filterChain.doFilter(request, response)가 호출되고, 다음 필터(혹은 컨트롤러)로 전달  
+    6. **결론 : 이 모든 과정이 SecurityContext에 올바르게 사용자 정보와 권한 정보를 저장하기 위함이었음.**
+
+- 토큰 관련 클래스 및 역할정리
+    1. JwtUtil (jwt 패키지)
+        -jwt의 생성, 서명, 만료시간설정, 유효성검증, 정보 추출 등 jwt와 관련된 모든 것
+    2. UserDetailsServicelmpl (service 패키지)
+        - Spring Security의 요청에 맞게, User 엔티티를 UserDetails 객체로 변환하여 제공
+    3. JwtAuthenticationFilter (jwt 패키지)
+        - 모든 http 요청을 가로채서, Authorization 헤더의 jwt를 검사
+        - 그 결과를 바탕으로 Spring Security 시스템에 인증 정보를 등록함
+    4. SecurityConfig (config 패키지)
+        - 어플리케이션의 보안 규칙 설정.
+        - 어떤 경로는 허용하고 어떤 경로를 막을지, 필터를 어떤 순서로 배치할지 등
+- 토큰 발급 과정 : 클라이언트 -> 컨트롤러 -> 서비스 -> JwtUtil -> 컨트롤러 -> 클라이언트
+- 토큰 검증 과정 : 클라이언트 -> 필터 -> JwtUtil -> UserDetailsServicelmpl -> 필터 -> 컨트롤러...
 
 
 ## 정리필요
 - 리포지토리, 엔티티 개념 다시
 - Config.java의 securityFilterChain 메서드 관련 개념 다시
+- jwt 발급 및 인증과정 전부 다시
 
 
 ### 작성중...

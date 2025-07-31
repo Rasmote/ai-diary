@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,8 @@ public class JwtUtil {
     
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenValiditySeconds;
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     
      /*
      private final String secret = "RasmoteAI_DiaryProject_SecretKeyForJWT_Authentication_2025";
@@ -58,6 +62,28 @@ public class JwtUtil {
                 .compact(); //토큰 생성
     }
 
-    
-    //TODO : 검증 및 정보 추출
+    // 토큰에서 사용자 이름을 추출하는 메소드
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    // 토큰의 유효성을 검사하는 메소드
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            // 토큰이 유효하지 않은 경우 여기서 예외가 발생함
+            logger.error("JWT 토큰 검증 실패: {}", e.getMessage());
+        }
+        return false; // 토큰이 유효하지 않음
+    }
 }

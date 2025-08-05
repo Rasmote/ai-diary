@@ -1,5 +1,6 @@
 package rasmote.github.io.ai_diary.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,10 +31,17 @@ public class Diary {
     private User user; // User 객체
 
     // 피드백, 생성 날짜 등 추가 예정.
+    @Column(columnDefinition = "TEXT")
+    private String aiFeedback;
 
     @Builder // 이 데코레이터를 사용함으로써, Diary 객체는 Dto에서 빌더를 사용하여 객체 생성이 가능함.
-    public Diary(String title, String content) {
+    public Diary(String title, String content, User user) {
         this.title = title;
         this.content = content;
+        this.user = user;
+    }
+
+    public void updateAiFeedback(String feedback) {
+        this.aiFeedback = feedback;
     }
 }

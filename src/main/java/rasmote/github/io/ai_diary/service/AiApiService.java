@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Mono; //Mono는 비동기 방식의 통신 결과를 담는 클래스
 
 @RequiredArgsConstructor
 public class AiApiService {

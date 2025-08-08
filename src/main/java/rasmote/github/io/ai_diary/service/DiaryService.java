@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.domain.Diary;
+import rasmote.github.io.ai_diary.domain.User;
 import rasmote.github.io.ai_diary.dto.DiaryRequestDto;
 import rasmote.github.io.ai_diary.dto.DiaryResponseDto;
 import rasmote.github.io.ai_diary.repository.DiaryRepository;
@@ -16,6 +17,7 @@ import rasmote.github.io.ai_diary.repository.DiaryRepository;
 @RequiredArgsConstructor
 public class DiaryService {
     private final DiaryRepository diaryRepository;
+    private final AiApiService aiApiService;
 
     public String getHelloMessage() {
         return "Hello, AI Diary!";
@@ -23,9 +25,29 @@ public class DiaryService {
 
     // C : Create
     @Transactional
-    public Diary createDiary(DiaryRequestDto diaryRequestDto) {
-        Diary diary = diaryRequestDto.toEntity(); //3. 전달받은 Dto를 Entity로 변환
-        return diaryRepository.save(diary); //4. 변환된 Entity를 리포지토리에 저장하고, 저장된 Entity를 반환
+    public Diary createDiary(DiaryRequestDto diaryRequestDto, User currentUser) {
+        Diary diary = Diary.builder()
+                .title(diaryRequestDto.getTitle())
+                .content(diaryRequestDto.getContent())
+                .user(currentUser)
+                .build();
+
+        Diary savedDiary = diaryRepository.save(diary);
+
+        aiApiService.getAiFeedback(diaryRequestDto.getContent())
+            .subscribe(
+                    aiFeedback -> { // AI 피드백이 성공적으로 도착했을 때
+                        savedDiary.updateAiFeedback(aiFeedback); // 일기 엔티티에 피드백 업데이트
+                        diaryRepository.save(savedDiary); // 업데이트된 일기 다시 저장
+                    },
+                    error -> { // AI 피드백 요청 중 오류가 발생했을 때
+                        System.err.println("AI 피드백 생성 중 오류 발생: " + error.getMessage());
+                        savedDiary.updateAiFeedback("AI 피드백 생성에 실패했습니다."); // 오류 메시지 저장
+                        diaryRepository.save(savedDiary); // 오류 메시지로 업데이트된 일기 저장
+                    }
+            );
+
+    return savedDiary;
     }
     
     // R : Read

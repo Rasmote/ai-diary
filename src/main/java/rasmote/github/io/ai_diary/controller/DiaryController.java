@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping; //@Get()
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController; //클래스 생�
 
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.domain.Diary;
+import rasmote.github.io.ai_diary.domain.User;
 import rasmote.github.io.ai_diary.dto.DiaryRequestDto;
 import rasmote.github.io.ai_diary.dto.DiaryResponseDto;
+import rasmote.github.io.ai_diary.repository.UserRepository;
 import rasmote.github.io.ai_diary.service.DiaryService;
 
 
@@ -22,6 +26,7 @@ import rasmote.github.io.ai_diary.service.DiaryService;
 @RequiredArgsConstructor
 public class DiaryController {
     private final DiaryService diaryService; //final 덕분에 생성자 생략 가능
+    private final UserRepository userRepository;
     //public DiaryController(DiaryService diaryService) { ... } 생략
 
     @GetMapping("/api/hello")
@@ -30,10 +35,15 @@ public class DiaryController {
     }
 
     // 1 . 일기 생성
-    @PostMapping("/api/diaries")    //1. 받아온 Body를 DiaryRequestDto로 변환하여
-    public ResponseEntity<Diary> createDiary(@RequestBody DiaryRequestDto diaryRequestDto) {
-        Diary createdDiary = diaryService.createDiary(diaryRequestDto); //2. Service로 전달
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdDiary); //5. Service에서  생성된 Diary 객체를 응답으로 반환
+    @PostMapping("/api/diaries")  
+    public ResponseEntity<Diary> createDiary
+        (@RequestBody DiaryRequestDto diaryRequestDto,  @AuthenticationPrincipal UserDetails userDetails ) {        //UserDetails는 현재 로그인한 사용자의 정보를 담고 있음
+            
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        
+        Diary createdDiary = diaryService.createDiary(diaryRequestDto, currentUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdDiary); 
     }
 
     // 2-1. 전체 일기 목록 조회

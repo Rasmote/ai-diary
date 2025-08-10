@@ -34,6 +34,12 @@ public class DiaryService {
 
         Diary savedDiary = diaryRepository.save(diary);
 
+        String feedback = aiApiService.getAiFeedback(diaryRequestDto.getContent())
+            .block(); // <-- Mono가 결과를 가져올 때까지 여기서 멈춤!
+
+        diary.updateAiFeedback(feedback);
+
+        /* 
         aiApiService.getAiFeedback(diaryRequestDto.getContent())
             .subscribe(
                     aiFeedback -> { // AI 피드백이 성공적으로 도착했을 때
@@ -46,8 +52,9 @@ public class DiaryService {
                         diaryRepository.save(savedDiary); // 오류 메시지로 업데이트된 일기 저장
                     }
             );
+         */
 
-    return savedDiary;
+        return diaryRepository.save(diary);
     }
     
     // R : Read

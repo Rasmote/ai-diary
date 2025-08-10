@@ -5,11 +5,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono; //Mono는 비동기 방식의 통신 결과를 담는 클래스
 
+@Service
 @RequiredArgsConstructor
 public class AiApiService {
     

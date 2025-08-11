@@ -26,19 +26,19 @@ public class DiaryService {
     // C : Create
     @Transactional
     public Diary createDiary(DiaryRequestDto diaryRequestDto, User currentUser) {
+        String feedback = aiApiService.getAiFeedback(diaryRequestDto.getContent())
+            .onErrorReturn("AI 피드백 생성 중 오류가 발생했습니다.") // 
+            .block();   
+
         Diary diary = Diary.builder()
                 .title(diaryRequestDto.getTitle())
                 .content(diaryRequestDto.getContent())
                 .user(currentUser)
                 .build();
 
-        Diary savedDiary = diaryRepository.save(diary);
-
-        String feedback = aiApiService.getAiFeedback(diaryRequestDto.getContent())
-            .block(); // <-- Mono가 결과를 가져올 때까지 여기서 멈춤!
-
         diary.updateAiFeedback(feedback);
 
+        return diaryRepository.save(diary);
         /* 
         aiApiService.getAiFeedback(diaryRequestDto.getContent())
             .subscribe(
@@ -53,8 +53,6 @@ public class DiaryService {
                     }
             );
          */
-
-        return diaryRepository.save(diary);
     }
     
     // R : Read

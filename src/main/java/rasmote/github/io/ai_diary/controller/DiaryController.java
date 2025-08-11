@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController; //클래스 생�
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.domain.Diary;
 import rasmote.github.io.ai_diary.domain.User;
+import rasmote.github.io.ai_diary.dto.CommonResponseDto;
 import rasmote.github.io.ai_diary.dto.DiaryRequestDto;
 import rasmote.github.io.ai_diary.dto.DiaryResponseDto;
 import rasmote.github.io.ai_diary.repository.UserRepository;
@@ -36,27 +37,28 @@ public class DiaryController {
 
     // 1 . 일기 생성
     @PostMapping("/api/diaries")  
-    public ResponseEntity<Diary> createDiary
+    public ResponseEntity<CommonResponseDto<Diary>> createDiary
         (@RequestBody DiaryRequestDto diaryRequestDto,  @AuthenticationPrincipal UserDetails userDetails ) {        //UserDetails는 현재 로그인한 사용자의 정보를 담고 있음
             
         User currentUser = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         
         Diary createdDiary = diaryService.createDiary(diaryRequestDto, currentUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdDiary); 
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(CommonResponseDto.success(createdDiary)); 
     }
 
     // 2-1. 전체 일기 목록 조회
     @GetMapping("/api/diaries")
-    public ResponseEntity<List<DiaryResponseDto>> getAllDiaries() {
+    public ResponseEntity<CommonResponseDto<List<DiaryResponseDto>>> getAllDiaries() {
         List<DiaryResponseDto> diaries = diaryService.getAllDiaries(); //1. Service에서 전체 일기 목록을 조회
-        return ResponseEntity.ok(diaries); //2. 조회된 일기 목록을 응답으로 반환
+        return ResponseEntity.ok(CommonResponseDto.success(diaries)); //2. 조회된 일기 목록을 응답으로 반환
     }
     
     // 2-2. 특정 일기 조회
     @GetMapping("/api/diaries/{id}")
-    public ResponseEntity<DiaryResponseDto> getDiaryById(@PathVariable("id") Long id) {   //@pathVariable은 URL 경로에서 변수를 추출
+    public ResponseEntity<CommonResponseDto<DiaryResponseDto>> getDiaryById(@PathVariable("id") Long id) {   //@pathVariable은 URL 경로에서 변수를 추출
         DiaryResponseDto diary = diaryService.getDiaryById(id); //1. Service에서 특정 일기를 조회
-        return ResponseEntity.ok(diary); //2. 조회된 일기를 응답으로 반환
+        return ResponseEntity.ok(CommonResponseDto.success(diary)); //2. 조회된 일기를 응답으로 반환
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.jwt.JwtAuthenticationFilter;
 import rasmote.github.io.ai_diary.jwt.JwtUtil;
@@ -51,7 +52,18 @@ public class SecurityConfig {
                 UsernamePasswordAuthenticationFilter.class);
 
 
-        return http.build(); 
+        // 5. 예외 처리 핸들러 설정 (존재하지 않는 일기 조회 오류메세지 반환 구현함)
+        http.exceptionHandling(handler -> handler
+            // 인증 실패(미인증 사용자) 시 처리
+            .authenticationEntryPoint((request, response, authException) -> 
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증되지 않은 사용자입니다.")
+            )
+            // 인가 실패(권한 없는 사용자) 시 처리
+            .accessDeniedHandler((request, response, accessDeniedException) -> 
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다.")
+            )
+        );
 
+        return http.build(); 
     }
 }

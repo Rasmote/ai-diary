@@ -11,6 +11,8 @@ import rasmote.github.io.ai_diary.domain.Diary;
 import rasmote.github.io.ai_diary.domain.User;
 import rasmote.github.io.ai_diary.dto.DiaryRequestDto;
 import rasmote.github.io.ai_diary.dto.DiaryResponseDto;
+import rasmote.github.io.ai_diary.exception.CustomException;
+import rasmote.github.io.ai_diary.exception.ErrorCode;
 import rasmote.github.io.ai_diary.repository.DiaryRepository;
 
 @Service
@@ -69,7 +71,7 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public DiaryResponseDto getDiaryById(Long id) {
         Diary diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 일기를 찾을 수 없습니다. id : " + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND)); 
         return new DiaryResponseDto(diary); // 조회된 Diary 객체를 DiaryResponseDto로 변환
     }
 

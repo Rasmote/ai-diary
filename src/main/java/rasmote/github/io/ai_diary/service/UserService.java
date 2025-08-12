@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.domain.User;
 import rasmote.github.io.ai_diary.dto.LoginRequestDto;
 import rasmote.github.io.ai_diary.dto.SignupRequestDto;
+import rasmote.github.io.ai_diary.exception.CustomException;
+import rasmote.github.io.ai_diary.exception.ErrorCode;
 import rasmote.github.io.ai_diary.jwt.JwtUtil;
 import rasmote.github.io.ai_diary.repository.UserRepository;
 
@@ -25,7 +27,7 @@ public class UserService {
     public User signup(SignupRequestDto requestDto) {
         //중복확인
         if (userRepository.findByUsername(requestDto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 사용자 이름입니다.");
+            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
         // 비밀번호 암호화
@@ -45,12 +47,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public String login(LoginRequestDto dto) {
         User user = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        return jwtUtil.createToken(user.getUsername(), 86400);
+        return jwtUtil.createAccessToken(user.getUsername());
     }
 }

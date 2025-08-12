@@ -8,10 +8,12 @@ public class DiaryResponseDto {
     private Long id;
     private String title;
     private String content;
+    private String aiFeedback;
 
     public DiaryResponseDto(Diary diary) {
         this.id = diary.getId();
         this.title = diary.getTitle();
         this.content = diary.getContent();
+        this.aiFeedback = diary.getAiFeedback();
     }
 }

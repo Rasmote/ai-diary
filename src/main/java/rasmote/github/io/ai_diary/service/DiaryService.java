@@ -3,6 +3,7 @@ package rasmote.github.io.ai_diary.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,14 +12,17 @@ import rasmote.github.io.ai_diary.domain.Diary;
 import rasmote.github.io.ai_diary.domain.User;
 import rasmote.github.io.ai_diary.dto.DiaryRequestDto;
 import rasmote.github.io.ai_diary.dto.DiaryResponseDto;
+import rasmote.github.io.ai_diary.dto.DiaryUpdateRequestDto;
 import rasmote.github.io.ai_diary.exception.CustomException;
 import rasmote.github.io.ai_diary.exception.ErrorCode;
 import rasmote.github.io.ai_diary.repository.DiaryRepository;
+import rasmote.github.io.ai_diary.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
     private final DiaryRepository diaryRepository;
+    private final UserRepository userRepository;
     private final AiApiService aiApiService;
 
     public String getHelloMessage() {
@@ -27,7 +31,11 @@ public class DiaryService {
 
     // C : Create
     @Transactional
-    public Diary createDiary(DiaryRequestDto diaryRequestDto, User currentUser) {
+    public DiaryResponseDto createDiary(DiaryRequestDto diaryRequestDto, UserDetails userDetails) {
+
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         String feedback = aiApiService.getAiFeedback(diaryRequestDto.getContent())
             .onErrorReturn("AI 피드백 생성 중 오류가 발생했습니다.") // 
             .block();   
@@ -40,7 +48,9 @@ public class DiaryService {
 
         diary.updateAiFeedback(feedback);
 
-        return diaryRepository.save(diary);
+        Diary SavedDiary = diaryRepository.save(diary);
+        
+        return new DiaryResponseDto(SavedDiary);
         /* 
         aiApiService.getAiFeedback(diaryRequestDto.getContent())
             .subscribe(
@@ -76,6 +86,23 @@ public class DiaryService {
     }
 
     // U : Update
+        
+    @Transactional
+    public DiaryResponseDto updateDiary(Long id, DiaryUpdateRequestDto dto, UserDetails userDetails) {
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+        
+        if (!diary.getUser().getId().equals(currentUser.getId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        diary.updateDiary(dto);
+
+        return new DiaryResponseDto(diary);
+    }
 
     // D : Delete
 }

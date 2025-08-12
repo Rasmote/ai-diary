@@ -15,6 +15,7 @@ public enum ErrorCode {
 
     // 401 Unauthorized
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "E003", "비밀번호가 일치하지 않습니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "E006", "권한이 없는 접근입니다."),
 
     // 404 Not Found
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "E004", "해당 사용자를 찾을 수 없습니다."),

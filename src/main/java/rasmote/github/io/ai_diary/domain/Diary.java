@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import rasmote.github.io.ai_diary.dto.DiaryUpdateRequestDto;
 
 @Entity
 @Getter
@@ -43,5 +44,10 @@ public class Diary {
 
     public void updateAiFeedback(String feedback) {
         this.aiFeedback = feedback;
+    }
+
+    public void updateDiary(DiaryUpdateRequestDto dto) {
+        dto.getTitle().ifPresent(action -> this.title = action);
+        dto.getContent().ifPresent(action -> this.content = action);
     }
 }

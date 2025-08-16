@@ -105,4 +105,19 @@ public class DiaryService {
     }
 
     // D : Delete
+
+    @Transactional
+    public void deleteDiary(Long id, UserDetails userDetails) {
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+
+        if (!diary.getUser().getId().equals(currentUser.getId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        diaryRepository.delete(diary);
+    }
 }

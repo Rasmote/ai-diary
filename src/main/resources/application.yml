@@ -1,5 +1,8 @@
 # application.yml
 
+server:
+  port: 3000
+
 spring:
   # 데이터베이스 연결 정보
   profiles:

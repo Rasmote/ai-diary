@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController; //클래스 생�
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.dto.CommonResponseDto;
 import rasmote.github.io.ai_diary.dto.DiaryRequestDto;
@@ -41,7 +42,7 @@ public class DiaryController {
     // C
     @Operation(summary = "일기 생성", description= "새로운 일기를 생성하고, AI피드백을 요청합니다.")
     @PostMapping("/diaries")
-    public ResponseEntity<CommonResponseDto<DiaryResponseDto>> createDiary(@RequestBody DiaryRequestDto diaryRequestDto,
+    public ResponseEntity<CommonResponseDto<DiaryResponseDto>> createDiary(@Valid @RequestBody DiaryRequestDto diaryRequestDto,
             @AuthenticationPrincipal UserDetails userDetails) { // UserDetails는 현재 로그인한 사용자의 정보를 담고 있음
 
         DiaryResponseDto createdDiary = diaryService.createDiary(diaryRequestDto, userDetails);

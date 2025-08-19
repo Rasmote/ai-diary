@@ -1,11 +1,17 @@
 package rasmote.github.io.ai_diary.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import rasmote.github.io.ai_diary.domain.Diary;
 
 @Getter
 public class DiaryRequestDto {
+    @NotBlank(message = "일기의 제목은 필수 입력입니다..")
+    @Size(max = 40, message = "제목 길이 제한을 초과하였습니다.")
     private String title;
+
+    @NotBlank(message = "일기의 내용은 필수 입력입니다.")
     private String content;
 
     //Entity에서 생성자에 @Builder가 붙어있기에, Dto에서도 Builder 패턴을 사용하여 Entity로 변환할 수 있다.

@@ -96,7 +96,7 @@ public class DiaryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
         
         if (!diary.getUser().getId().equals(currentUser.getId())) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
 
         diary.updateDiary(dto);
@@ -115,7 +115,7 @@ public class DiaryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         if (!diary.getUser().getId().equals(currentUser.getId())) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
 
         diaryRepository.delete(diary);

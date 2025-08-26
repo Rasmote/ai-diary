@@ -19,10 +19,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<CommonResponseDto<Void>> handleCustomException(CustomException e) {
         ErrorCode errorCode = e.getErrorCode();
-        log.warn("CustomException: {} - {}", errorCode.getCode(), errorCode.getMessage());
+        log.warn("CustomException occurred: {}", errorCode.getMessage());
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CommonResponseDto.failure(errorCode.getCode(), errorCode.getMessage()));
+                .body(CommonResponseDto.failure(errorCode.getStatus(), errorCode.getMessage()));
     }
 
     // @Valid 유효성 검증이 실패한 경우
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE; // ErrorCode에 추가 필요
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CommonResponseDto.failure(errorCode.getCode(), errorCode.getMessage()));
+                .body(CommonResponseDto.failure(errorCode.getStatus(), errorCode.getMessage()));
     }
 
     // Spring Security에서 발생하는 경우
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.FORBIDDEN_ACCESS; // ErrorCode에 추가 필요
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CommonResponseDto.failure(errorCode.getCode(), errorCode.getMessage()));
+                .body(CommonResponseDto.failure(errorCode.getStatus(), errorCode.getMessage()));
     }
 
     // 그 이외 우리가 명시하지 않은 모든 오류
@@ -52,6 +52,6 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR; // ErrorCode에 추가 필요
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CommonResponseDto.failure(errorCode.getCode(), errorCode.getMessage()));
+                .body(CommonResponseDto.failure(errorCode.getStatus(), errorCode.getMessage()));
     }
 }

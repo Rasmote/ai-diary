@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
@@ -17,14 +18,14 @@ public class CommonResponseDto<T> {
         return new CommonResponseDto<>(true, data, null);
     }
 
-    public static <T> CommonResponseDto<T> failure(String code, String message) {
-        return new CommonResponseDto<>(false, null, new ErrorResponse(code, message));
+    public static <T> CommonResponseDto<T> failure(HttpStatus status, String message) {
+        return new CommonResponseDto<>(false, null, new ErrorResponse(status.value(), message));
     }
 
     @Getter
     @AllArgsConstructor
     private static class ErrorResponse {
-        private final String code;
+        private final int status;
         private final String message;
     }
 }

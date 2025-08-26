@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import rasmote.github.io.ai_diary.dto.SignupRequestDto;
 import rasmote.github.io.ai_diary.service.UserService;
 
 @Tag(name = "User API", description = "사용자 관련 API")
+@SecurityRequirement(name = "none")
 @RestController
 @RequestMapping("/api/auth") // 이 컨트롤러 내부의 모든 API는 /api/auth 경로로 시작
 @RequiredArgsConstructor

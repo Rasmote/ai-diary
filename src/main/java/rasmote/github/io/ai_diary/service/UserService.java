@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import rasmote.github.io.ai_diary.domain.User;
 import rasmote.github.io.ai_diary.dto.LoginRequestDto;
+import rasmote.github.io.ai_diary.dto.LoginResponseDto;
 import rasmote.github.io.ai_diary.dto.SignupRequestDto;
 import rasmote.github.io.ai_diary.exception.CustomException;
 import rasmote.github.io.ai_diary.exception.ErrorCode;
@@ -45,7 +46,7 @@ public class UserService {
     
     // 로그인 메소드
     @Transactional(readOnly = true)
-    public String login(LoginRequestDto dto) {
+    public LoginResponseDto login(LoginRequestDto dto) {
         User user = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         
@@ -53,6 +54,9 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        return jwtUtil.createAccessToken(user.getUsername());
+        String accessToken = jwtUtil.createAccessToken(user.getUsername());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUsername());
+
+        return new LoginResponseDto(accessToken, refreshToken);
     }
 }

@@ -116,5 +116,55 @@ Ai 다이어리
 - Config.java의 securityFilterChain 메서드 관련 개념 다시
 - jwt 발급 및 인증과정 전부 다시
 
+## 트러블슈팅
+#### **1. 개발 환경 설정의 어려움: `Unresolved dependency` & `NoSuchMethodError`**
+
+*   **문제 현상:**
+    *   `build.gradle`에 `mysql-connector-j`나 `springdoc-openapi` 같은 새로운 라이브러리를 추가했음에도, VSCode에서 관련 클래스를 찾지 못하는 `cannot be resolved` 오류가 발생함.
+    *   Swagger UI 접속 시, `GlobalExceptionHandler`와 관련된 `NoSuchMethodError`가 발생하며 `500 Internal Server Error`가 나타남.
+*   **원인 분석:**
+    *   단순히 의존성을 추가하는 것만으로는 부족하며, **Gradle 프로젝트 동기화(새로고침)**가 필수적임을 학습함.
+    *   `NoSuchMethodError`는 **Spring Boot 버전과 외부 라이브러리(springdoc-openapi) 간의 버전 호환성 문제** 때문임을 파악함. (예: Spring Boot 3.3.2는 springdoc 2.5.0과 호환)
+*   **해결 과정:**
+    *   **Gradle 캐시의 오염**이 문제 해결을 방해하는 주범임을 깨달음.
+    *   프로젝트 내부(`.gradle`, `build`) 및 사용자 홈 디렉토리의 전역 Gradle 캐시를 **완전히 삭제**하고, 의존성을 깨끗한 상태로 재설치하여 문제를 근본적으로 해결함.
+    *   이 과정을 통해 IDE나 빌드 도구의 캐시가 어떻게 개발에 영향을 미치는지 직접 경험함.
+
+#### **2. 원격 서버 연동: `Communications link failure`**
+
+*   **문제 현상:**
+    *   로컬 Spring Boot 애플리케이션이 원격 동아리 서버의 MariaDB에 접속하지 못하고, 약 30초 후 타임아웃과 함께 `Communications link failure` 오류가 발생함.
+*   **원인 분석:**
+    *   단순히 DB를 설치하고 계정을 만드는 것만으로는 외부에서 접속할 수 없다는 것을 깨달음.
+    *   **서버의 방화벽(`ufw`)**과 **상위 네트워크의 방화벽**이라는 두 단계의 보안 계층이 존재함을 이해함.
+*   **해결 과정:**
+    *   SSH로 서버에 접속하여 **`ufw`**를 설정하고, 필요한 포트(SSH: 200, MariaDB: 3306)를 직접 허용함.
+    *   **포트 포워딩**의 개념을 학습하고, 서버 관리자에게 요청하여 외부 포트(210)와 내부 포트(3306)를 연결함으로써 상위 네트워크 방화벽 문제를 해결함.
+    *   이 과정을 통해 실제 서비스 환경과 유사한 네트워크 구성 및 방화벽 설정에 대한 실무적인 경험을 쌓음.
+
+#### **3. Spring Security와 JWT: `401/403` 오류와 토큰 만료 문제**
+
+*   **문제 현상:**
+    *   Spring Security 의존성 추가 후, `permitAll()`로 설정한 로그인/회원가입 API조차 `401/403` 오류로 접근이 차단됨.
+    *   JWT 토큰이 발급된 지 몇 초 만에 만료되는 현상 발생.
+    *   `JWT signature does not match` 오류가 발생하며 토큰 검증에 실패함.
+*   **원인 분석:**
+    *   Spring Security는 기본적으로 **CSRF 보호 기능**이 활성화되어, `GET` 이외의 모든 요청을 차단한다는 사실을 학습함.
+    *   JWT 라이브러리(`jjwt`)가 요구하는 **비밀 키의 최소 길이(256비트/32바이트)**를 충족하지 못해 `WeakKeyException`이 내부적으로 발생하고 있었음을 발견함.
+    *   토큰의 유효 시간을 **'초(seconds)' 단위**로 설정하고, 실제로는 **'밀리초(milliseconds)' 단위**로 계산하는 로직의 불일치를 찾아냄.
+*   **해결 과정:**
+    *   `SecurityConfig`에서 **`http.csrf().disable()`** 설정을 추가하여, Stateless한 REST API 환경에 맞게 보안 설정을 변경함.
+    *   JWT 비밀 키를 32바이트 이상의 안전한 길이로 변경하여 서명 문제를 해결함.
+    *   시간 단위를 `* 1000L` 연산을 통해 밀리초로 명확하게 변환하여 토큰 유효 기간 문제를 해결함.
+
+#### **4. JPA와 데이터 정합성: `NullPointerException`**
+
+*   **문제 현상:**
+    *   일기 삭제 API 호출 시, `diary.getUser().getId()` 부분에서 `NullPointerException`이 발생함.
+*   **원인 분석:**
+    *   사용자 기능이 추가되기 **이전에 생성했던 테스트용 일기 데이터**들은 `user_id` 컬럼이 `NULL` 상태임을 파악함.
+*   **해결 과정:**
+    *   `DELETE FROM diary WHERE user_id IS NULL;` 쿼리를 통해 오래된 테스트 데이터를 정리하여 데이터 정합성을 맞춤.
+    *   이를 통해, 개발 과정에서 **데이터베이스 스키마 변경이 기존 데이터에 미치는 영향**을 이해하고, 데이터 마이그레이션의 필요성을 간접적으로 경험함.
 
 ### 작성중...

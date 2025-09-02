@@ -3,9 +3,11 @@ package rasmote.github.io.ai_diary.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.Setter;
 import rasmote.github.io.ai_diary.domain.Diary;
 
 @Getter
+@Setter
 public class DiaryRequestDto {
     @NotBlank(message = "일기의 제목은 필수 입력입니다..")
     @Size(max = 40, message = "제목 길이 제한을 초과하였습니다.")

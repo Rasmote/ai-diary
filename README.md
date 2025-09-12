@@ -61,6 +61,8 @@ Ai 다이어리
 
 
 ## 메모장
+<details>
+<summary> <b> - 펼치기- </b> </summary>
 - Nest에서는 TypeORM을 활용하여 관계형 데이터베이스를 객체 지향적인 방식으로 다뤘음. Spring에서는 Spring Data JPA가 해당 역할을 수행.  
 - Spring Data JPA는 JPA라는 표준 기술을 쉽게 쓰게 함.
 - JPA : JAVA의 ORM 인터페이스. DB랑 연동하기 위해 필요한 것들의 규칙을 정해놓은 것.
@@ -107,8 +109,8 @@ Ai 다이어리
 - 같은 패키지 내부의 클래스들은 임포트 안해도 사용가능
 - 자바는 클래스를 상속시켰을 경우, 자식클래스에 spuer()을 사용해야함. 다만 생략은 가능.
 - 전역 예외 처리를 위해서는 RestControllerAdvice 어노테이션을 사용하는 컨트롤러가 필요
-    1. CustomException(내가 작성), 이외에도 dto유효성관련, spring security관련, 이외에 모든 오류 관련 .class 가 필요.
-    
+    1. CustomException(내가 작성), 이외에도 dto유효성관련, spring security관련, 이외에 모든 오류 관련 .class 가 필요.</details>
+</details>
 
 
 ## 정리필요
@@ -117,6 +119,8 @@ Ai 다이어리
 - jwt 발급 및 인증과정 전부 다시
 
 ## 트러블슈팅
+<details>
+<summary> <b> - 펼치기 - </b></summary>
 #### **1. 개발 환경 설정의 어려움: `Unresolved dependency` & `NoSuchMethodError`**
 
 *   **문제 현상:**
@@ -166,5 +170,6 @@ Ai 다이어리
 *   **해결 과정:**
     *   `DELETE FROM diary WHERE user_id IS NULL;` 쿼리를 통해 오래된 테스트 데이터를 정리하여 데이터 정합성을 맞춤.
     *   이를 통해, 개발 과정에서 **데이터베이스 스키마 변경이 기존 데이터에 미치는 영향**을 이해하고, 데이터 마이그레이션의 필요성을 간접적으로 경험함.
+</details>
 
 ### 작성중...

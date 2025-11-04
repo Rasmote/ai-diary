@@ -28,7 +28,7 @@ import rasmote.github.io.ai_diary.service.UserService;
 @Tag(name = "User API", description = "사용자 관련 API")
 @SecurityRequirement(name = "none")
 @RestController
-@RequestMapping("/api/auth") // 이 컨트롤러 내부의 모든 API는 /api/auth 경로로 시작
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 
 public class UserController {

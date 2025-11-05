@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import rasmote.github.io.ai_diary.domain.User;
+// import rasmote.github.io.ai_diary.domain.User; // User 객체를 직접 반환하지 않으므로 주석 처리 가능
 import rasmote.github.io.ai_diary.dto.CommonResponseDto;
 import rasmote.github.io.ai_diary.dto.LoginRequestDto;
 import rasmote.github.io.ai_diary.dto.LoginResponseDto;
@@ -30,14 +30,13 @@ import rasmote.github.io.ai_diary.service.UserService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-
 public class UserController {
     private final UserService userService;
-    
+
     //1. 회원가입
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "회원가입 성공",
+            @ApiResponse(responseCode = "201", description = "회원가IP 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class),
                             examples = @ExampleObject(value = "{\"success\": true, \"data\": \"회원가입이 성공적으로 완료되었습니다.\"}"))),
@@ -45,14 +44,15 @@ public class UserController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class),
                             examples = {
-                                    @ExampleObject(name = "입력값 유효성 검증 실패 (E001)", value = "{\"success\": false, \"error\": {\"code\": \"E001\", \"message\": \"입력값이 올바르지 않습니다.\"}}"),
-                                    @ExampleObject(name = "이미 존재하는 사용자 이름 (E002)", value = "{\"success\": false, \"error\": {\"code\": \"E002\", \"message\": \"이미 존재하는 사용자 이름입니다.\"}}")
+                                    @ExampleObject(name = "입력값 유효성 검증 실패 (INVALID_INPUT_VALUE)", value = "{\"success\": false, \"error\": {\"code\": \"INVALID_INPUT_VALUE\", \"message\": \"입력값이 올바르지 않습니다.\"}}"),
+                                    @ExampleObject(name = "이미 존재하는 사용자 이름 (USERNAME_ALREADY_EXISTS)", value = "{\"success\": false, \"error\": {\"code\": \"USERNAME_ALREADY_EXISTS\", \"message\": \"이미 존재하는 사용자 이름입니다.\"}}")
                             }))
     })
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@Valid @RequestBody SignupRequestDto requestDto) {
-        User user = userService.signup(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    public ResponseEntity<CommonResponseDto<String>> signup(@Valid @RequestBody SignupRequestDto requestDto) {
+        userService.signup(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponseDto.success("회원가입이 성공적으로 완료되었습니다."));
     }
 
     //2. 로그인
@@ -62,14 +62,14 @@ public class UserController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class),
                             examples = @ExampleObject(value = "{\"success\": true, \"data\": {\"accessToken\": \"eyJhbGciOi...\", \"refreshToken\": \"eyJhbGciOi...\"}}"))),
-            @ApiResponse(responseCode = "401", description = "비밀번호 불일치 (E003)",
+            @ApiResponse(responseCode = "401", description = "아이디 또는 비밀번호가 일치하지 않습니다.",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class),
-                            examples = @ExampleObject(value = "{\"success\": false, \"error\": {\"code\": \"E003\", \"message\": \"비밀번호가 일치하지 않습니다.\"}}"))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 사용자 (E004)",
+                            examples = @ExampleObject(name = "INVALID_CREDENTIALS", value = "{\"success\": false, \"error\": {\"code\": \"INVALID_CREDENTIALS\", \"message\": \"아이디 또는 비밀번호가 일치하지 않습니다.\"}}"))),
+            @ApiResponse(responseCode = "404", description = "해당 사용자를 찾을 수 없습니다.",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class),
-                            examples = @ExampleObject(value = "{\"success\": false, \"error\": {\"code\": \"E004\", \"message\": \"해당 사용자를 찾을 수 없습니다.\"}}")))
+                            examples = @ExampleObject(name = "USER_NOT_FOUND", value = "{\"success\": false, \"error\": {\"code\": \"USER_NOT_FOUND\", \"message\": \"해당 사용자를 찾을 수 없습니다.\"}}")))
     })
     @PostMapping("/login")
     public ResponseEntity<CommonResponseDto<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse response) {

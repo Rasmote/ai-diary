@@ -10,10 +10,10 @@ Ai 다이어리
 
 최대한 RESTFUL하게!
 
-##  주요 기능 (Key Features)
--  **기능 1**: 로그인, 회원가입
--  **기능 2**: 일기장 선택 가능. 심리적 안정을 위한 일기인지, 매일 간단하게라도 쓰는 일기인지, 자기개발용인지
--  **기능 3**: 일기장 분류에 걸맞는 적절한 피드백
+## 주요 기능 (Key Features)
+- **JWT 기반 사용자 인증**: Spring Security와 JWT를 활용하여 안전한 회원가입 및 로그인 기능을 제공합니다.
+- **일기 CRUD**: 사용자는 일기를 생성하고 조회할 수 있습니다.
+- **AI 피드백 연동**: Google Gemini API와 `WebClient`를 연동하여, 일기 생성 시 AI가 분석한 피드백을 자동으로 함께 저장합니다.
 
 ## 기술 스택
 - Java 17
@@ -23,23 +23,52 @@ Ai 다이어리
 - H2 Database
 - Lombok
 
-<!--## 
-⚙️ 실행 방법
+## 실행 방법
 
 1.  **프로젝트 클론**
     ```bash
     git clone [이 저장소 주소]
     ```
 
-2.  **AI API 키 설정 (중요!)**
-    `src/main/resources/application.properties` 파일에 아래 내용을 추가하고 본인의 API 키를 입력하세요.
-    ```properties
-    ai.api.key=여기에_당신의_API_키를_입력하세요
+2.  **보안 설정 파일 생성**
+    `src/main/resources/` 경로에 `application-secret.yml` 파일을 생성하고, 아래 내용을 본인의 환경에 맞게 입력하세요.
+    ```yaml
+    jwt:
+      secret: (시크릿 키 입력)
+
+    spring:
+      datasource:
+        url: (DB URL 입력)
+        username: (DB 계정)
+        password: (DB 비밀번호)
+
+    gemini:
+      api:
+        key: (Gemini API 키)
     ```
 
 3.  **애플리케이션 실행**
     VSCode 또는 IntelliJ에서 `AiDiaryApplication.java` 파일을 열고 실행합니다.
--->
+
+## ERD
+```mermaid
+erDiagram
+    User {
+        Long id PK
+        String username
+        String password
+        Date created_at
+    }
+    Diary {
+        Long id PK
+        String title
+        String content
+        String ai_feedback
+        Long user_id FK
+    }
+
+    User ||--|{ Diary : "작성"
+```
 
 ## 진행 상황 (Progress)
 - [x] 사용자 회원가입 및 로그인 기능 구현 (JWT 기반)

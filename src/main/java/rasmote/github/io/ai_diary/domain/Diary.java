@@ -19,10 +19,11 @@ import rasmote.github.io.ai_diary.dto.DiaryUpdateRequestDto;
 public class Diary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본키값 자동생성(Auto Increase)
-    private Long Id;
+    private Long id;
 
     private String title;
 
+    @Column(columnDefinition = "Text")
     private String content;
 
     @ManyToOne // Many(다이어리) to One(유저) 관계
@@ -31,7 +32,7 @@ public class Diary {
     // 만약 username을 외래키로 사용하고 싶다면 이렇게 작성
     private User user; // User 객체
 
-    // 피드백, 생성 날짜 등 추가 예정.
+    //TODO 피드백, 생성 날짜 등 추가 예정.
     @Column(columnDefinition = "TEXT")
     private String aiFeedback;
 

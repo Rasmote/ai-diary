@@ -58,7 +58,7 @@ erDiagram
         String username
         String password
         Date created_at
-    } 
+    }
     Diary {
         Long id PK
         String title
@@ -66,8 +66,19 @@ erDiagram
         String ai_feedback
         Long user_id FK
     }
+    DiaryTag {
+        Long id PK
+        Long diary_id FK
+        Long tag_id FK
+    }
+    Tag {
+        Long id PK
+        String name
+    }
 
-    User ||--|{ Diary : "작성"}
+    User ||--o{ Diary : "writes"
+    Diary ||--o{ DiaryTag : "has"
+    Tag ||--o{ DiaryTag : "included_in"
 ```
 
 ## 📑 API 문서 (Swagger)

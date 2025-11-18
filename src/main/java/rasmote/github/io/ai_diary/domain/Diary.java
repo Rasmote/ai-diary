@@ -1,17 +1,14 @@
 package rasmote.github.io.ai_diary.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import rasmote.github.io.ai_diary.dto.DiaryUpdateRequestDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,6 +32,10 @@ public class Diary {
     //TODO 피드백, 생성 날짜 등 추가 예정.
     @Column(columnDefinition = "TEXT")
     private String aiFeedback;
+
+    //Tag
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DiaryTag> diaryTags = new ArrayList<>();
 
     @Builder // 이 데코레이터를 사용함으로써, Diary 객체는 Dto에서 빌더를 사용하여 객체 생성이 가능함.
     public Diary(String title, String content, User user) {
